@@ -5,7 +5,7 @@ import {
     SidebarGroup,
     SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem
 } from "@/shared/shadcn/components/ui/sidebar.tsx";
-import {ChefHat, ClipboardList, History, LogOut, UserRound, UtensilsCrossed} from "lucide-react";
+import {ChartColumnBig, ChefHat, ClipboardList, ClipboardClock, LogOut, UserRound, Utensils} from "lucide-react";
 
 export function SidebarComponent() {
     const menuItems = [
@@ -16,48 +16,45 @@ export function SidebarComponent() {
         },
         {
             title: "Historial",
-            icon: History,
+            icon: ClipboardClock,
             href: "/history",
         },
         {
             title: "Menú",
-            icon: UtensilsCrossed,
+            icon: Utensils,
+            href: "/menu",
+        },
+        {
+            title: "Reportes",
+            icon: ChartColumnBig,
             href: "/menu",
         },
     ];
 
 
     return (
-        <Sidebar collapsible="icon">
-            <SidebarHeader className="border-b px-4 py-5">
-                <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-500 text-white">
-                        <ChefHat size={24} />
-                    </div>
-
-                    <div className="group-data-[collapsible=icon]:hidden">
-                        <p className="text-lg font-semibold leading-none">
-                            Room Service
-                        </p>
-
-                        <p className="text-sm text-muted-foreground">
-                            Cocina
-                        </p>
-                    </div>
-                </div>
+        <Sidebar collapsible="icon" className="border-r-0 shadow-none">
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton>
+                            <ChefHat size={24}/>
+                            <span className="text-lg font-semibold leading-none">Room Service</span>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
             </SidebarHeader>
 
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>
-                        <SidebarMenu>
+                        <SidebarMenu className="space-y-2">
                             {menuItems.map((item) => {
                                 const Icon = item.icon;
-
                                 return (
                                     <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton>
-                                            <Icon size={18}/>
+                                        <SidebarMenuButton className="h-14 px-4">
+                                            <Icon className="size-7 shrink-0" />
                                             <span>{item.title}</span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
@@ -68,24 +65,25 @@ export function SidebarComponent() {
                 </SidebarGroup>
             </SidebarContent>
 
-            <SidebarFooter className="border-t">
+            <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton>
-                            <UserRound size={18} />
-                            <div className="flex-col items-start group-data-[collapsible=icon]:hidden">
-                    <span className="text-sm font-medium">
-                        Juan Pérez
-                    </span>
-                                <span className="text-xs text-muted-foreground">
-                        Chef
-                    </span>
+                            <UserRound size={25}/>
+                            <div style={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                width: '100%',
+                                justifyContent: 'space-between'
+                            }}>
+                                <span className="text-sm font-medium">Juan Pérez</span>
+                                <span className="text-xs text-muted-foreground">Chef</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
                         <SidebarMenuButton>
-                            <LogOut size={18} />
+                            <LogOut size={18}/>
                             <span>Cerrar sesión</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
