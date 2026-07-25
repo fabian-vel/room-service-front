@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {LoginFormComponent} from "../components/LoginFormComponent.tsx";
-import {loginEmpleado} from "../service/authService.ts";
+import {loginUser} from "../service/authService.ts";
 import {useAuthStore} from "@/shared/store/authStore.ts";
 
 export function LoginScreen() {
@@ -14,7 +14,7 @@ export function LoginScreen() {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await loginEmpleado({usuario, password});
+      const response = await loginUser({usuario, password});
       saveToken(response.token, response.nombre, response.rol);
       navigate('/order');
     } catch (err: any) {
