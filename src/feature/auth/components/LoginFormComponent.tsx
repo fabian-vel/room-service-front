@@ -1,42 +1,50 @@
-import {Field, FieldDescription, FieldGroup, FieldLabel, FieldSet} from "@/shared/shadcn/components/ui/field.tsx";
+import {useState} from "react";
+import {Field, FieldGroup, FieldLabel, FieldSet, FieldDescription} from "@/shared/shadcn/components/ui/field.tsx";
 import {Input} from "@/shared/shadcn/components/ui/input.tsx";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
 
 interface LoginFormComponentProps {
-    onSubmit: () => void;
+    onSubmit: (usuario: string, password: string) => void;
+    isLoading?: boolean;
 }
 
-export function LoginFormComponent({onSubmit}: Readonly<LoginFormComponentProps>) {
+export function LoginFormComponent({onSubmit, isLoading}: Readonly<LoginFormComponentProps>) {
+    const [usuario, setUsuario] = useState('');
+    const [password, setPassword] = useState('');
+
     return (
-        <FieldSet  className="w-full max-w-sm p-6 bg-base-200 rounded-2xl shadow-sm">
-            <FieldDescription className="text-center text-base-content/60 mb-6 text-sm">
-                Introduce el número de habitación y el código de acceso proporcionado en recepción.
+        <FieldSet className="w-full max-w-sm p-6 bg-white rounded-2xl shadow-sm">
+            <FieldDescription className="text-center text-stone-500 mb-6 text-sm">
+                Introduce tus credenciales para acceder al sistema.
             </FieldDescription>
             <FieldGroup>
                 <Field>
-                    <FieldLabel  className="fieldset-legend">Número de Habitación</FieldLabel >
+                    <FieldLabel>Usuario</FieldLabel>
                     <Input
                         type="text"
-                        placeholder="Ej: 302"
-                        className="input w-full"
+                        placeholder="Ej: cocina1"
+                        value={usuario}
+                        onChange={(e) => setUsuario(e.target.value)}
                     />
                 </Field>
                 <Field>
-                    <FieldLabel  className="fieldset-legend">Código de Acceso</FieldLabel >
+                    <FieldLabel>Contraseña</FieldLabel>
                     <Input
-                        type="text"
-                        placeholder="Ej: A7X9"
-                        className="input w-full"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
                 </Field>
                 <Button
                     type="submit"
-                    className="btn btn-primary w-full mt-6"
-                    onClick={onSubmit}
+                    className="w-full mt-6"
+                    disabled={isLoading}
+                    onClick={() => onSubmit(usuario, password)}
                 >
-                    Ingresar a la Habitación
+                    {isLoading ? 'Ingresando...' : 'Ingresar'}
                 </Button>
-                </FieldGroup>
+            </FieldGroup>
         </FieldSet>
     );
 }
