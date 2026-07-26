@@ -3,6 +3,11 @@ import {OrderCardComponente} from "@/feature/order/components/OrderCardComponent
 import {useEffect, useState} from "react";
 import type {Order} from "@/feature/order/types/Order.ts";
 import {getOrder} from "@/feature/order/service/OrderService.ts";
+import {KitchenWebSocketService} from "@/feature/order/service/KitchenWebSocketService.ts";
+import type {OrderEvent} from "@/types/OrderEvent.ts";
+import {OrderEventType} from "@/types/OrderEventType.ts";
+
+const webSocketService = new KitchenWebSocketService();
 
 export function OrderScreen() {
 
@@ -10,10 +15,31 @@ export function OrderScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    const handleOrderEvent = (event: OrderEvent) => {
+        switch (event.type) {
+            case OrderEventType.CREATED:
+                fetchOrders()
+                    .then(setOrders)
+                    .catch(e => setError(e.message));
+                break;
+            case OrderEventType.STATUS_CHANGED:
+                break;
+            case OrderEventType.UPDATED:
+                break;
+            case OrderEventType.CANCELLED:
+                break;
+        }
+    };
+
+    const fetchOrders = async (): Promise<Order[]> => {
+        return await getOrder();
+    };
+
     useEffect(() => {
-        const fetchOrders = async () => {
+        const loadOrders = async () => {
             try {
-                setOrders(await getOrder());
+                const orders = await fetchOrders();
+                setOrders(orders);
             } catch (e: any) {
                 setError(e.message);
             } finally {
@@ -21,7 +47,11 @@ export function OrderScreen() {
             }
         };
 
-        fetchOrders();
+        loadOrders();
+
+        webSocketService.connect(handleOrderEvent);
+
+        return () => webSocketService.disconnect();
     }, []);
 
     if (loading)

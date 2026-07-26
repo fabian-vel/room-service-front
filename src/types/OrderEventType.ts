@@ -1,0 +1,6 @@
+export enum OrderEventType {
+    CREATED = "CREATED",
+    UPDATED = "UPDATED",
+    STATUS_CHANGED = "STATUS_CHANGED",
+    CANCELLED = "CANCELLED"
+}
