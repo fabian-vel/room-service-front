@@ -5,32 +5,12 @@ import {
     SidebarGroup,
     SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem
 } from "@/shared/shadcn/components/ui/sidebar.tsx";
-import {ChartColumnBig, ChefHat, ClipboardList, ClipboardClock, LogOut, UserRound, Utensils} from "lucide-react";
+import {ChefHat, LogOut, UserRound} from "lucide-react";
+import {Link, useLocation} from "react-router-dom";
+import {MENU_ITEMS} from "@/component/sidebar/menuItems.ts";
 
 export function SidebarComponent() {
-    const menuItems = [
-        {
-            title: "Pedidos",
-            icon: ClipboardList,
-            href: "/orders",
-        },
-        {
-            title: "Historial",
-            icon: ClipboardClock,
-            href: "/history",
-        },
-        {
-            title: "Menú",
-            icon: Utensils,
-            href: "/menu",
-        },
-        {
-            title: "Reportes",
-            icon: ChartColumnBig,
-            href: "/menu",
-        },
-    ];
-
+    const {pathname} = useLocation();
 
     return (
         <Sidebar collapsible="icon" className="border-r-0 shadow-none">
@@ -49,12 +29,16 @@ export function SidebarComponent() {
                 <SidebarGroup>
                     <SidebarGroupContent>
                         <SidebarMenu className="space-y-2">
-                            {menuItems.map((item) => {
+                            {MENU_ITEMS.map((item) => {
                                 const Icon = item.icon;
                                 return (
                                     <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton className="h-14 px-4">
-                                            <Icon className="size-7 shrink-0" />
+                                        <SidebarMenuButton
+                                            render={<Link to={item.href}/>}
+                                            isActive={pathname === item.href}
+                                            className="h-14 px-4"
+                                        >
+                                            <Icon className="size-7 shrink-0"/>
                                             <span>{item.title}</span>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>

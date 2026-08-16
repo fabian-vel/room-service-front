@@ -1,8 +1,12 @@
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/shared/shadcn/components/ui/sidebar.tsx";
 import {SidebarComponent} from "@/component/sidebar/SidebarComponent.tsx";
-import {Outlet} from "react-router-dom";
+import {Outlet, useLocation} from "react-router-dom";
+import {MENU_ITEMS} from "@/component/sidebar/menuItems.ts";
 
 export function SidebarLayoutComponent() {
+    const {pathname} = useLocation();
+
+    const title = MENU_ITEMS.find(item => item.href === pathname)?.title ?? "Room Service";
     const date = new Date();
 
     const hour = new Intl.DateTimeFormat("es-CO", {
@@ -26,7 +30,7 @@ export function SidebarLayoutComponent() {
                     <div className="flex items-center gap-3">
                         <SidebarTrigger/>
                         <h1 className="text-xl font-semibold">
-                            Pedidos
+                            {title}
                         </h1>
                     </div>
                     <div className="flex flex-col items-end">

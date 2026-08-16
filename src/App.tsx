@@ -1,5 +1,6 @@
 import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import {LoginScreen} from "./feature/auth/screen/LoginScreen";
+import {OrderScreen} from "./feature/order/screen/OrderScreen";
 import {DailyOrderScreen} from "./feature/daily-order/screen/DailyOrderScreen";
 import {useAuthStore} from "@/shared/store/authStore.ts";
 import {SidebarLayoutComponent} from "@/component/sidebar/SidebarLayoutComponent.tsx";
@@ -19,7 +20,8 @@ function App() {
                         <SidebarLayoutComponent/>
                     </ProtectedRoute>
                 }>
-                    <Route path="/order" element={<DailyOrderScreen/>}/>
+                    <Route path="/order" element={<OrderScreen/>}/>
+                    <Route path="/pedidos-del-dia" element={<DailyOrderScreen/>}/>
                     {/* agrega aquí las futuras vistas */}
                 </Route>
                 <Route path="*" element={<Navigate to="/login" replace/>}/>
