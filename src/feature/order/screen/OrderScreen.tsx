@@ -6,6 +6,8 @@ import {getOrder} from "@/feature/order/service/OrderService.ts";
 import {KitchenWebSocketService} from "@/feature/order/service/KitchenWebSocketService.ts";
 import type {OrderEvent} from "@/types/OrderEvent.ts";
 import {OrderEventType} from "@/types/OrderEventType.ts";
+import {Button} from "@/shared/shadcn/components/ui/button.tsx";
+import {OrderDetailsSheet} from "@/feature/order/components/OrderDetailsSheet.tsx";
 
 const webSocketService = new KitchenWebSocketService();
 
@@ -14,6 +16,8 @@ export function OrderScreen() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [sheetOpen, setSheetOpen] = useState(false);
 
     const handleOrderEvent = (event: OrderEvent) => {
         switch (event.type) {
@@ -54,6 +58,11 @@ export function OrderScreen() {
         return () => webSocketService.disconnect();
     }, []);
 
+    const openOrder = (order: Order) => {
+        setSelectedOrder(order);
+        setSheetOpen(true);
+    };
+
     if (loading)
         return <div className="flex h-full items-center justify-center">Cargando...</div>;
 
@@ -86,8 +95,21 @@ export function OrderScreen() {
                             key={order.pediId}
                             state="pendiente"
                             order={order}
+                            onClick={openOrder}
                         />
                     ))}
+                </div>
+                <div className="flex flex-row justify-center mt-auto w-full">
+                    <Button
+                        type="submit"
+                        className="w-full mt-6 bg-transparent border border-yellow-600 text-back
+                        hover:bg-transparent hover:text-white hover:bg-yellow-600"
+                        disabled={pendientes.length <= 0}
+                        onClick={() => {
+                        }}
+                    >
+                        Ver todo ({pendientes.length})
+                    </Button>
                 </div>
             </section>
             <section className={columnClass}>
@@ -105,8 +127,21 @@ export function OrderScreen() {
                             key={order.pediId}
                             state="preparacion"
                             order={order}
+                            onClick={openOrder}
                         />
                     ))}
+                </div>
+                <div className="flex flex-row justify-center mt-auto w-full">
+                    <Button
+                        type="submit"
+                        className="w-full mt-6 bg-transparent border border-green-700 text-back
+                        hover:bg-transparent hover:text-white hover:bg-green-700"
+                        disabled={preparacion.length <= 0}
+                        onClick={() => {
+                        }}
+                    >
+                        Ver todo ({pendientes.length})
+                    </Button>
                 </div>
             </section>
             <section className={columnClass}>
@@ -124,10 +159,28 @@ export function OrderScreen() {
                             key={order.pediId}
                             state="entregado"
                             order={order}
+                            onClick={openOrder}
                         />
                     ))}
                 </div>
+                <div className="flex flex-row justify-center mt-auto w-full">
+                    <Button
+                        type="submit"
+                        className="w-full mt-6 bg-transparent border border-blue-900 text-back
+                        hover:bg-transparent hover:text-white hover:bg-blue-900"
+                        disabled={entregados.length <= 0}
+                        onClick={() => {
+                        }}
+                    >
+                        Ver todo ({pendientes.length})
+                    </Button>
+                </div>
             </section>
+            <OrderDetailsSheet
+                open={sheetOpen}
+                order={selectedOrder}
+                onOpenChange={setSheetOpen}
+            />
         </div>
     );
 }

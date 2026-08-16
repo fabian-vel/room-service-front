@@ -14,4 +14,7 @@ export interface OrderDetails {
     meitNombre: string;
     pedeCantidad: number;
     pedeSubtotal: number;
+    mecaParentId: number;
+    mecaId: number;
+    mecaNombre: string;
 }

@@ -1,5 +1,5 @@
 import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/shared/shadcn/components/ui/sidebar.tsx";
-import {SidebarComponent} from "@/component/sidebar/components/SidebarComponent.tsx";
+import {SidebarComponent} from "@/component/sidebar/SidebarComponent.tsx";
 import {Outlet} from "react-router-dom";
 
 export function SidebarLayoutComponent() {
@@ -34,7 +34,7 @@ export function SidebarLayoutComponent() {
                         <span className="text-sm text-muted-foreground">{fullDate}</span>
                     </div>
                 </header>
-                <main className="flex-1 min-h-0 overflow-hidden p-6 bg-slate-100">
+                <main className="flex-1 min-h-0 overflow-hidden px-6 py-2 bg-slate-100">
                     <Outlet/>
                 </main>
             </SidebarInset>

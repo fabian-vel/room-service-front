@@ -2,7 +2,7 @@ import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import {LoginScreen} from "./feature/auth/screen/LoginScreen";
 import {OrderScreen} from "./feature/order/screen/OrderScreen";
 import {useAuthStore} from "@/shared/store/authStore.ts";
-import {SidebarLayoutComponent} from "@/component/sidebar/components/SidebarLayoutComponent.tsx";
+import {SidebarLayoutComponent} from "@/component/sidebar/SidebarLayoutComponent.tsx";
 
 function ProtectedRoute({children}: {children: React.ReactNode}) {
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);

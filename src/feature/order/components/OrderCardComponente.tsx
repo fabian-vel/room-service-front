@@ -1,24 +1,26 @@
 import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/shared/shadcn/components/ui/card.tsx";
-import {Bell, CircleHelp, CookingPot, CircleCheck, ArrowRight} from "lucide-react";
+import {Bell, CircleHelp, CookingPot, CircleCheck} from "lucide-react";
 import type {Order} from "@/feature/order/types/Order.ts";
+import {formatHour} from "@/shared/utils/date.ts";
+import {calcularTotalProductos} from "@/shared/utils/order.ts";
 
 interface OrderCardProps {
     state: "pendiente" | "preparacion" | "entregado";
     order: Order;
+    onClick: (order: Order) => void;
 }
 
-export function OrderCardComponente({state, order,}: Readonly<OrderCardProps>) {
+export function OrderCardComponente({state, order, onClick}: Readonly<OrderCardProps>) {
 
     const {pediHabitacion, detallePedidoList, pediTotal, pediFechaCreacion} = order;
 
-    const hora = new Date(pediFechaCreacion).toLocaleTimeString("es-CO", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    const hora = formatHour(pediFechaCreacion);
 
     const nombresItems = detallePedidoList
         .map(i => `${i.meitNombre} x${i.pedeCantidad}`)
         .join(", ");
+
+    const totalProductos = calcularTotalProductos(detallePedidoList);
 
     const borderColor = (() => {
         switch (state) {
@@ -43,7 +45,8 @@ export function OrderCardComponente({state, order,}: Readonly<OrderCardProps>) {
     })();
 
     return (
-        <Card className={`w-full border-l-4 ${borderColor}`}>
+        <Card className={`w-full border-l-4 ${borderColor}`}
+              onClick={() => onClick(order)}>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-gray-200 px-2 text-base font-semibold">
@@ -62,11 +65,10 @@ export function OrderCardComponente({state, order,}: Readonly<OrderCardProps>) {
                             {nombresItems}
                         </p>
                     </div>
-                    <ArrowRight className="h-5 w-5 shrink-0"/>
                 </div>
                 <div className="flex items-center justify-between">
                     <span className="text-gray-700">
-                        {detallePedidoList.length} producto(s)
+                        {totalProductos} producto(s)
                     </span>
                     <span className="font-semibold">
                         ${pediTotal}
