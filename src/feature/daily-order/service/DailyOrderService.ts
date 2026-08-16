@@ -1,4 +1,4 @@
-import type {Order} from "@/feature/order/types/Order.ts";
+import type {Order} from "@/feature/daily-order/types/Order.ts";
 import {axiosInstance} from "@/api/axios.ts";
 
 

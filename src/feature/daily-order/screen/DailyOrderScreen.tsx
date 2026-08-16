@@ -1,17 +1,17 @@
 import {cn} from "@/shared/shadcn/lib/utils.ts";
-import {OrderCardComponente} from "@/feature/order/components/OrderCardComponente.tsx";
+import {OrderCardComponente} from "@/feature/daily-order/components/OrderCardComponente.tsx";
 import {useEffect, useState} from "react";
-import type {Order} from "@/feature/order/types/Order.ts";
-import {getOrder} from "@/feature/order/service/OrderService.ts";
-import {KitchenWebSocketService} from "@/feature/order/service/KitchenWebSocketService.ts";
+import type {Order} from "@/feature/daily-order/types/Order.ts";
+import {getOrder} from "@/feature/daily-order/service/DailyOrderService.ts";
+import {KitchenWebSocketService} from "@/feature/daily-order/service/KitchenWebSocketService.ts";
 import type {OrderEvent} from "@/types/OrderEvent.ts";
 import {OrderEventType} from "@/types/OrderEventType.ts";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
-import {OrderDetailsSheet} from "@/feature/order/components/OrderDetailsSheet.tsx";
+import {OrderDetailsSheet} from "@/feature/daily-order/components/OrderDetailsSheet.tsx";
 
 const webSocketService = new KitchenWebSocketService();
 
-export function OrderScreen() {
+export function DailyOrderScreen() {
 
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);

@@ -1,4 +1,4 @@
-import type {OrderDetails} from "@/feature/order/types/Order.ts";
+import type {OrderDetails} from "@/feature/daily-order/types/Order.ts";
 import {Separator} from "@/shared/shadcn/components/ui/separator.tsx";
 import React from "react";
 

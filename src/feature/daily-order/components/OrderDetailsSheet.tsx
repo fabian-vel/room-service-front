@@ -6,10 +6,10 @@ import {
     SheetHeader,
     SheetTitle
 } from "@/shared/shadcn/components/ui/sheet.tsx";
-import type {Order, OrderDetails} from "@/feature/order/types/Order.ts";
+import type {Order, OrderDetails} from "@/feature/daily-order/types/Order.ts";
 import {Bed, ClipboardList, Clock, HandPlatter} from "lucide-react";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
-import {SubcategoryList} from "@/feature/order/components/SubcategoryList.tsx";
+import {SubcategoryList} from "@/feature/daily-order/components/SubcategoryList.tsx";
 import {Separator} from "@/shared/shadcn/components/ui/separator.tsx";
 import {formatHour} from "@/shared/utils/date.ts";
 import {calcularTotalProductos} from "@/shared/utils/order.ts";
