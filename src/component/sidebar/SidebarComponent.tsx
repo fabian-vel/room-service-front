@@ -6,11 +6,21 @@ import {
     SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem
 } from "@/shared/shadcn/components/ui/sidebar.tsx";
 import {ChefHat, LogOut, UserRound} from "lucide-react";
-import {Link, useLocation} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {MENU_ITEMS} from "@/component/sidebar/menuItems.ts";
+import {useAuthStore} from "@/shared/store/authStore.ts";
 
 export function SidebarComponent() {
     const {pathname} = useLocation();
+    const navigate = useNavigate();
+    const clearToken = useAuthStore((state) => state.clearToken);
+    const nombre = useAuthStore((state) => state.nombre);
+    const rol = useAuthStore((state) => state.rol);
+
+    const handleLogout = () => {
+        clearToken();
+        navigate("/login", {replace: true});
+    };
 
     return (
         <Sidebar collapsible="icon" className="border-r-0 shadow-none">
@@ -60,13 +70,13 @@ export function SidebarComponent() {
                                 width: '100%',
                                 justifyContent: 'space-between'
                             }}>
-                                <span className="text-sm font-medium">Juan Pérez</span>
-                                <span className="text-xs text-muted-foreground">Chef</span>
+                                <span className="text-sm font-medium">{nombre ?? "Usuario"}</span>
+                                <span className="text-xs text-muted-foreground">{rol ?? "Empleado"}</span>
                             </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                     <SidebarMenuItem>
-                        <SidebarMenuButton>
+                        <SidebarMenuButton onClick={handleLogout}>
                             <LogOut size={18}/>
                             <span>Cerrar sesión</span>
                         </SidebarMenuButton>

@@ -40,22 +40,26 @@ export function DailyOrderScreen() {
     };
 
     useEffect(() => {
-        const loadOrders = async () => {
-            try {
-                const orders = await fetchOrders();
-                setOrders(orders);
-            } catch (e: any) {
-                setError(e.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadOrders();
+        const controller = new AbortController();
+        getOrder(controller.signal)
+            .then(orders => {
+                if (!controller.signal.aborted) setOrders(orders);
+            })
+            .catch((e: unknown) => {
+                if (!controller.signal.aborted && e instanceof Error && e.name !== 'AbortError') {
+                    setError(e.message);
+                }
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setLoading(false);
+            });
 
         webSocketService.connect(handleOrderEvent);
 
-        return () => webSocketService.disconnect();
+        return () => {
+            controller.abort();
+            webSocketService.disconnect();
+        };
     }, []);
 
     const openOrder = (order: Order) => {

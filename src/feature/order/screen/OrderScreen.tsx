@@ -40,18 +40,20 @@ export function OrderScreen() {
     const [filter, setFilter] = useState("");
 
     useEffect(() => {
-        const loadOrders = async () => {
-            try {
-                const data = await getOrders();
-                setOrders(data);
-            } catch (error) {
-                setError(error instanceof Error ? error.message : "Error desconocido");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        loadOrders();
+        const controller = new AbortController();
+        getOrders(controller.signal)
+            .then(data => {
+                if (!controller.signal.aborted) setOrders(data);
+            })
+            .catch((e: unknown) => {
+                if (!controller.signal.aborted && e instanceof Error && e.name !== 'AbortError') {
+                    setError(e.message);
+                }
+            })
+            .finally(() => {
+                if (!controller.signal.aborted) setLoading(false);
+            });
+        return () => controller.abort();
     }, []);
 
     const tabOrders = useMemo(() => {

@@ -6,9 +6,10 @@ import {
     TableHeader,
     TableRow
 } from "@/shared/shadcn/components/ui/table.tsx";
-import {ChevronRight} from "lucide-react";
+import {Bell, CircleCheck, CircleX, CookingPot} from "lucide-react";
 import type {Order} from "@/feature/order/types/Order.ts";
 import {formatHour} from "@/shared/utils/date.ts";
+import React from "react";
 
 interface OrdersTableProps {
     orders: Order[];
@@ -16,11 +17,11 @@ interface OrdersTableProps {
     onOpenWindow?: (order: Order) => void;
 }
 
-const estadoClass: Record<number, string> = {
-    1: "border-yellow-600 text-yellow-700",
-    2: "border-green-700 text-green-700",
-    3: "border-blue-900 text-blue-800",
-    4: "border-red-600 text-red-600",
+const estateConfig: Record<number, { className: string; icon: React.ReactElement }> = {
+    1: {className: "bg-yellow-50 text-yellow-700", icon: <Bell className="size-5" fill="currentColor"/>},
+    2: {className: "bg-green-50 text-green-700", icon: <CookingPot className="size-5" fill="currentColor"/>},
+    3: {className: "bg-blue-50 text-blue-800", icon: <CircleCheck className="size-5" color="#fff"  fill="currentColor"/>},
+    4: {className: "bg-red-50 text-red-600", icon: <CircleX className="size-5" color="#fff"  fill="currentColor"/>},
 };
 
 export function OrdersTable({orders, showEstado = false, onOpenWindow}: Readonly<OrdersTableProps>) {
@@ -46,7 +47,6 @@ export function OrdersTable({orders, showEstado = false, onOpenWindow}: Readonly
                         <TableHead>Productos</TableHead>
                         <TableHead>Total</TableHead>
                         <TableHead>Hora</TableHead>
-                        <TableHead className="w-10"/>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -69,21 +69,26 @@ export function OrdersTable({orders, showEstado = false, onOpenWindow}: Readonly
                                 <TableCell>{order.pediHabitacion}</TableCell>
                                 {showEstado && (
                                     <TableCell>
-                                        <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold ${estadoClass[order.espeId] ?? "border-gray-400 text-gray-500"}`}>
+                                        <span
+                                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs 
+                                            ${estateConfig[order.espeId]?.className}`}>
+                                            {estateConfig[order.espeId]?.icon}
                                             {order.espeNombre}
                                         </span>
                                     </TableCell>
                                 )}
-                                <TableCell className="max-w-[380px]">
-                                    <span className="block truncate">{productos(order)}</span>
+                                <TableCell className="max-w-95">
+                                    <div className="flex flex-col justify-center gap-1">
+                                        <span className="block truncate">{productos(order)}</span>
+                                        <span className="text-[11px] text-gray-600 font-bold">
+                                            {order.detallePedidoList.length} producto(s)
+                                        </span>
+                                    </div>
                                 </TableCell>
                                 <TableCell className="font-semibold">
                                     ${order.pediTotal.toLocaleString("es-CO")}
                                 </TableCell>
                                 <TableCell>{formatHour(order.pediFechaCreacion)}</TableCell>
-                                <TableCell>
-                                    <ChevronRight className="size-4 text-muted-foreground"/>
-                                </TableCell>
                             </TableRow>
                         ))
                     )}
