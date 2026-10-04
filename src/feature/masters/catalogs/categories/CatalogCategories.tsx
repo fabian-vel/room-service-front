@@ -4,11 +4,11 @@ import {getCategories, createCategory, updateCategory, deleteCategory} from "@/f
 import {CategoriesTable} from "@/feature/masters/catalogs/categories/components/CategoriesTable.tsx";
 import {CategoriesForm} from "@/feature/masters/catalogs/categories/components/CategoriesForm.tsx";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
-import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/shared/shadcn/components/ui/dialog.tsx";
-import {AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle} from "@/shared/shadcn/components/ui/alert-dialog.tsx";
-import {Plus} from "lucide-react";
+import {Pencil, Plus, Trash2} from "lucide-react";
 import {usePagination} from "@/shared/hooks/usePagination.ts";
-import {Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious} from "@/shared/shadcn/components/ui/pagination.tsx";
+import {CatalogPaginator} from "@/feature/masters/catalogs/components/CatalogPaginator.tsx";
+import {CatalogAlert} from "@/feature/masters/catalogs/components/CatalogAlert.tsx";
+import {CatalogDialog} from "@/feature/masters/catalogs/components/CatalogDialog.tsx";
 
 export function CatalogCategories() {
     const [data, setData] = useState<Category[]>([]);
@@ -17,7 +17,8 @@ export function CatalogCategories() {
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<Category | null>(null);
-    const [deleteTarget, setDeleteTarget] = useState<Category | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<Category | null>(null)
+    const [selectedItem, setSelectedItem] = useState<Category | null>(null);
 
     const fetchData = async () => {
         try {
@@ -65,6 +66,7 @@ export function CatalogCategories() {
         if (!deleteTarget) return;
         await deleteCategory(deleteTarget.mecaId);
         setDeleteTarget(null);
+        setSelectedItem(null);
         await fetchData();
     };
 
@@ -91,75 +93,56 @@ export function CatalogCategories() {
             <div className="flex justify-end">
                 <Button onClick={openCreate} className="gap-2">
                     <Plus className="size-4"/>
-                    Create category
+                    Crear categoría
+                </Button>
+                <Button className="gap-2 bg-green-800 ml-2"
+                        hidden={!selectedItem}
+                        onClick={() => selectedItem && openEdit(selectedItem)}
+                >
+                    <Pencil className="size-4"/>
+                    Editar
+                </Button>
+                <Button
+                    className="gap-2 bg-red-500 ml-2"
+                    hidden={!selectedItem}
+                    onClick={() => setDeleteTarget(selectedItem)}
+                >
+                    <Trash2 className="size-4"/>
+                    Eliminar
                 </Button>
             </div>
 
             <div className="min-h-0 flex-1">
-                <CategoriesTable data={paginatedData} onEdit={openEdit} onDelete={setDeleteTarget}/>
+                <CategoriesTable data={paginatedData}
+                             selectedItem={selectedItem}
+                             onSelectionChange={setSelectedItem}
+                />
             </div>
 
-            {totalPages > 1 && (
-                <Pagination>
-                    <PaginationContent>
-                        <PaginationItem>
-                            <PaginationPrevious
-                                onClick={() => goToPage(currentPage - 1)}
-                                className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                            />
-                        </PaginationItem>
-                        {Array.from({length: totalPages}, (_, i) => i + 1).map(page => (
-                            <PaginationItem key={page}>
-                                <PaginationLink
-                                    isActive={page === currentPage}
-                                    onClick={() => goToPage(page)}
-                                    className="cursor-pointer"
-                                >
-                                    {page}
-                                </PaginationLink>
-                            </PaginationItem>
-                        ))}
-                        <PaginationItem>
-                            <PaginationNext
-                                onClick={() => goToPage(currentPage + 1)}
-                                className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                            />
-                        </PaginationItem>
-                    </PaginationContent>
-                </Pagination>
-            )}
+            <CatalogPaginator
+                currentPage={currentPage}
+                totalPages={totalPages}
+                goToPage={goToPage}
+            />
 
-            <Dialog open={formOpen} onOpenChange={setFormOpen}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle>
-                            {editingItem ? "Edit" : "Create"} category
-                        </DialogTitle>
-                    </DialogHeader>
-                    <CategoriesForm
-                        initialData={editingItem}
-                        onSubmit={editingItem ? handleUpdate : handleCreate}
-                        onCancel={() => setFormOpen(false)}
-                    />
-                </DialogContent>
-            </Dialog>
+            <CatalogDialog
+                formOpen={formOpen}
+                editingItem={editingItem}
+                setFormOpen={setFormOpen}
+                catalogName={'categoría'}>
+                <CategoriesForm
+                    initialData={editingItem}
+                    onSubmit={editingItem ? handleUpdate : handleCreate}
+                    onCancel={() => setFormOpen(false)}
+                />
+            </CatalogDialog>
 
-            <AlertDialog open={!!deleteTarget} onOpenChange={open => !open && setDeleteTarget(null)}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Delete category?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This record will be disabled. This action cannot be undone.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete}>
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <CatalogAlert<Category>
+                deleteTarget={deleteTarget}
+                setDeleteTarget={setDeleteTarget}
+                handleDelete={handleDelete}
+                catalogName={'categoría'}
+            />
         </div>
     );
 }

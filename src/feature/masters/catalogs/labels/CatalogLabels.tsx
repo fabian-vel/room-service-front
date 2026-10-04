@@ -93,7 +93,7 @@ export function CatalogLabels() {
             <div className="flex justify-end">
                 <Button onClick={openCreate} className="gap-2">
                     <Plus className="size-4"/>
-                    Create categoria
+                    Crear etiqueta
                 </Button>
                 <Button className="gap-2 bg-green-800 ml-2"
                         hidden={!selectedItem}
@@ -119,19 +119,17 @@ export function CatalogLabels() {
                 />
             </div>
 
-            {totalPages > 1 && (
-                <CatalogPaginator
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    goToPage={goToPage}
-                />
-            )}
+            <CatalogPaginator
+                currentPage={currentPage}
+                totalPages={totalPages}
+                goToPage={goToPage}
+            />
 
             <CatalogDialog
                 formOpen={formOpen}
                 editingItem={editingItem}
                 setFormOpen={setFormOpen}
-                catalogName={'categoria'}>
+                catalogName={'etiqueta'}>
                 <LabelsForm
                     initialData={editingItem}
                     onSubmit={editingItem ? handleUpdate : handleCreate}
@@ -143,7 +141,7 @@ export function CatalogLabels() {
                 deleteTarget={deleteTarget}
                 setDeleteTarget={setDeleteTarget}
                 handleDelete={handleDelete}
-                catalogName={'categoria'}
+                catalogName={'etiqueta'}
             />
         </div>
     );
