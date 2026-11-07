@@ -11,7 +11,9 @@ export class KitchenWebSocketService {
             return;
         }
 
-        const url = `ws://192.168.18.9:8083/ws/pedidos?token=${token}`;
+        // mismo host y puerto que el API (VITE_API_LOCAL_URL)
+        const api = new URL(import.meta.env.VITE_API_LOCAL_URL);
+        const url = `${api.protocol === 'https:' ? 'wss' : 'ws'}://${api.host}/ws/pedidos?token=${token}`;
         this.socket = new WebSocket(url);
 
         this.socket.onopen = () => {
