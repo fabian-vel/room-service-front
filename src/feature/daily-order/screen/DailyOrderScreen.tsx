@@ -181,9 +181,16 @@ export function DailyOrderScreen() {
                 </div>
             </section>
             <OrderDetailsSheet
+                key={selectedOrder?.pediId}
                 open={sheetOpen}
                 order={selectedOrder}
                 onOpenChange={setSheetOpen}
+                onEstadoCambiado={() => {
+                    setSheetOpen(false);
+                    fetchOrders()
+                        .then(setOrders)
+                        .catch(e => setError(e.message));
+                }}
             />
         </div>
     );
