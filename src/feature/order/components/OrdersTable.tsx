@@ -8,7 +8,7 @@ import {
 } from "@/shared/shadcn/components/ui/table.tsx";
 import {Bell, CircleCheck, CircleX, CookingPot} from "lucide-react";
 import type {Order} from "@/feature/order/types/Order.ts";
-import {formatHour} from "@/shared/utils/date.ts";
+import {formatDate, formatHour} from "@/shared/utils/date.ts";
 import React from "react";
 
 interface OrdersTableProps {
@@ -34,7 +34,7 @@ export function OrdersTable({orders, showEstado = false, onOpenWindow}: Readonly
         return order.detallePedidoList.map(i => i.meitNombre).join(", ");
     };
 
-    const colSpan = (showEstado ? 6 : 5) + 1;
+    const colSpan = showEstado ? 7 : 6;
 
     return (
         <div className="h-full overflow-y-auto rounded-xl border bg-white">
@@ -46,6 +46,7 @@ export function OrdersTable({orders, showEstado = false, onOpenWindow}: Readonly
                         {showEstado && <TableHead>Estado</TableHead>}
                         <TableHead>Productos</TableHead>
                         <TableHead>Total</TableHead>
+                        <TableHead>Fecha</TableHead>
                         <TableHead>Hora</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -88,6 +89,7 @@ export function OrdersTable({orders, showEstado = false, onOpenWindow}: Readonly
                                 <TableCell className="font-semibold">
                                     ${order.pediTotal.toLocaleString("es-CO")}
                                 </TableCell>
+                                <TableCell>{formatDate(order.pediFechaCreacion)}</TableCell>
                                 <TableCell>{formatHour(order.pediFechaCreacion)}</TableCell>
                             </TableRow>
                         ))

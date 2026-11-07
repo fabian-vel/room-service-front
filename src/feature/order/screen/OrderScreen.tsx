@@ -1,49 +1,80 @@
-import {useEffect, useMemo, useState} from "react";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/shared/shadcn/components/ui/tabs.tsx";
+import {useEffect, useState} from "react";
 import {Input} from "@/shared/shadcn/components/ui/input.tsx";
-import {Search} from "lucide-react";
+import {Label} from "@/shared/shadcn/components/ui/label.tsx";
+import {Button} from "@/shared/shadcn/components/ui/button.tsx";
+import {
+    Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue
+} from "@/shared/shadcn/components/ui/select.tsx";
+import {Search, X} from "lucide-react";
 import type {Order} from "@/feature/order/types/Order.ts";
 import {getOrders} from "@/feature/order/service/OrderService.ts";
 import {OrdersTable} from "@/feature/order/components/OrdersTable.tsx";
+import {CatalogPaginator} from "@/feature/masters/catalogs/components/CatalogPaginator.tsx";
 
-const ESTADO_PENDIENTE = 1;
-const ESTADO_PREPARACION = 2;
-const ESTADO_ENTREGADO = 3;
-const ESTADO_CANCELADO = 4;
+const PAGE_SIZE = 20;
+const MIN_PRODUCTO_LENGTH = 3;
+const DEBOUNCE_MS = 400;
+const TODOS = "todos";
 
-const TABS = [
-    {value: "todos", label: "Todos"},
-    {value: "pendientes", label: "Pendientes"},
-    {value: "preparacion", label: "En preparación"},
-    {value: "entregados", label: "Entregados"},
-    {value: "cancelados", label: "Cancelados"},
+// los valores corresponden a espe_id en mst_estados_pedido
+const ESTADOS = [
+    {value: TODOS, label: "Todos"},
+    {value: "1", label: "Pendiente"},
+    {value: "2", label: "En preparación"},
+    {value: "3", label: "Entregado"},
+    {value: "4", label: "Cancelado"},
 ] as const;
 
-type TabValue = (typeof TABS)[number]["value"];
+interface Filters {
+    desde: string;
+    hasta: string;
+    estado: string;
+    habitacion: string;
+    producto: string;
+}
 
-const ESTADOS_FILTRO: Record<Exclude<TabValue, "todos">, number> = {
-    pendientes: ESTADO_PENDIENTE,
-    preparacion: ESTADO_PREPARACION,
-    entregados: ESTADO_ENTREGADO,
-    cancelados: ESTADO_CANCELADO,
-};
-
-const productosText = (order: Order): string => {
-    return order.detallePedidoList.map(i => i.meitNombre).join(", ").toLowerCase();
+const EMPTY_FILTERS: Filters = {
+    desde: "",
+    hasta: "",
+    estado: TODOS,
+    habitacion: "",
+    producto: "",
 };
 
 export function OrderScreen() {
 
     const [orders, setOrders] = useState<Order[]>([]);
+    const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [filter, setFilter] = useState("");
+
+    // filtros aplicados a la consulta; al entrar a la vista se consulta sin filtros
+    const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+    const [page, setPage] = useState(1);
+    const [habitacionInput, setHabitacionInput] = useState("");
+    const [productoInput, setProductoInput] = useState("");
+
+    const applyFilters = (changes: Partial<Filters>) => {
+        setFilters(prev => ({...prev, ...changes}));
+        setPage(1);
+    };
 
     useEffect(() => {
         const controller = new AbortController();
-        getOrders(controller.signal)
+        getOrders({
+            fechaDesde: filters.desde || undefined,
+            fechaHasta: filters.hasta || undefined,
+            estadoPedido: filters.estado === TODOS ? undefined : Number(filters.estado),
+            habitacion: filters.habitacion || undefined,
+            producto: filters.producto || undefined,
+            page,
+            size: PAGE_SIZE,
+        }, controller.signal)
             .then(data => {
-                if (!controller.signal.aborted) setOrders(data);
+                if (controller.signal.aborted) return;
+                setOrders(data.items);
+                setTotal(data.total);
+                setError(null);
             })
             .catch((e: unknown) => {
                 if (!controller.signal.aborted && e instanceof Error && e.name !== 'AbortError') {
@@ -54,27 +85,28 @@ export function OrderScreen() {
                 if (!controller.signal.aborted) setLoading(false);
             });
         return () => controller.abort();
-    }, []);
+    }, [filters, page]);
 
-    const tabOrders = useMemo(() => {
-        const term = filter.trim().toLowerCase();
+    // los filtros de texto se aplican cuando el usuario deja de escribir
+    useEffect(() => {
+        const habitacion = habitacionInput.trim();
+        const term = productoInput.trim();
+        const producto = term.length >= MIN_PRODUCTO_LENGTH ? term : "";
+        if (habitacion === filters.habitacion && producto === filters.producto) return;
 
-        const filterByProductos = (list: Order[]): Order[] => {
-            if (term.length < 3) {
-                return list;
-            }
+        const timeout = setTimeout(() => {
+            setFilters(prev => ({...prev, habitacion, producto}));
+            setPage(1);
+        }, DEBOUNCE_MS);
+        return () => clearTimeout(timeout);
+    }, [habitacionInput, productoInput, filters.habitacion, filters.producto]);
 
-            return list.filter(order => productosText(order).includes(term));
-        };
-
-        return TABS.reduce<Record<TabValue, Order[]>>((acc, tab) => {
-            const list = tab.value === "todos"
-                ? orders
-                : orders.filter(o => o.espeId === ESTADOS_FILTRO[tab.value]);
-            acc[tab.value] = filterByProductos(list);
-            return acc;
-        }, {} as Record<TabValue, Order[]>);
-    }, [orders, filter]);
+    const clearFilters = () => {
+        setHabitacionInput("");
+        setProductoInput("");
+        setFilters(EMPTY_FILTERS);
+        setPage(1);
+    };
 
     if (loading)
         return <div className="flex h-full items-center justify-center">Cargando...</div>;
@@ -82,40 +114,95 @@ export function OrderScreen() {
     if (error)
         return <div className="flex h-full items-center justify-center text-red-600">{error}</div>;
 
+    const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
     return (
-        <Tabs defaultValue="todos" className="flex h-full flex-col gap-3">
-            <div className="flex items-center justify-between gap-4">
-                <TabsList className="h-9">
-                    {TABS.map(tab => (
-                        <TabsTrigger key={tab.value} value={tab.value}>
-                            {tab.label}
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
+        <div className="flex h-full flex-col gap-3">
+            <div className="flex flex-wrap items-end gap-4">
+                <div className="grid gap-1.5">
+                    <Label htmlFor="filtro_desde">Desde</Label>
+                    <Input
+                        id="filtro_desde"
+                        type="date"
+                        value={filters.desde}
+                        max={filters.hasta || undefined}
+                        onChange={e => applyFilters({desde: e.target.value})}
+                        className="w-40"
+                    />
+                </div>
+                <div className="grid gap-1.5">
+                    <Label htmlFor="filtro_hasta">Hasta</Label>
+                    <Input
+                        id="filtro_hasta"
+                        type="date"
+                        value={filters.hasta}
+                        min={filters.desde || undefined}
+                        onChange={e => applyFilters({hasta: e.target.value})}
+                        className="w-40"
+                    />
+                </div>
+                <div className="grid gap-1.5">
+                    <Label>Estado</Label>
+                    <Select
+                        items={ESTADOS}
+                        value={filters.estado}
+                        onValueChange={value => applyFilters({estado: value as string})}
+                    >
+                        <SelectTrigger className="w-44">
+                            <SelectValue/>
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                {ESTADOS.map(estado => (
+                                    <SelectItem key={estado.value} value={estado.value}>
+                                        {estado.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="grid gap-1.5">
+                    <Label htmlFor="filtro_habitacion">Habitación</Label>
+                    <Input
+                        id="filtro_habitacion"
+                        placeholder="Ej: 302"
+                        value={habitacionInput}
+                        onChange={e => setHabitacionInput(e.target.value)}
+                        className="w-28"
+                    />
+                </div>
                 <div className="relative">
                     <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"/>
                     <Input
                         placeholder="Filtrar por producto..."
-                        value={filter}
-                        onChange={e => setFilter(e.target.value)}
+                        value={productoInput}
+                        onChange={e => setProductoInput(e.target.value)}
                         className="w-72 pl-8"
                     />
                 </div>
+                <Button variant="outline" className="gap-2" onClick={clearFilters}>
+                    <X className="size-4"/>
+                    Limpiar filtros
+                </Button>
+                <span className="ml-auto text-sm text-muted-foreground">{total} pedido(s)</span>
             </div>
 
             <div className="min-h-0 flex-1">
-                {TABS.map(tab => (
-                    <TabsContent key={tab.value} value={tab.value} className="h-full">
-                        <OrdersTable
-                            orders={tabOrders[tab.value]}
-                            showEstado={tab.value === "todos"}
-                            onOpenWindow={(order) => {
-                                console.log("Abrir ventana del pedido", order.pediId);
-                            }}
-                        />
-                    </TabsContent>
-                ))}
+                <OrdersTable
+                    orders={orders}
+                    showEstado
+                    onOpenWindow={(order) => {
+                        console.log("Abrir ventana del pedido", order.pediId);
+                    }}
+                />
             </div>
-        </Tabs>
+
+            <CatalogPaginator
+                currentPage={Math.min(page, totalPages)}
+                totalPages={totalPages}
+                goToPage={target => setPage(Math.max(1, Math.min(target, totalPages)))}
+            />
+        </div>
     );
 }
