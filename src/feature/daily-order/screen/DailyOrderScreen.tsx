@@ -8,6 +8,7 @@ import type {OrderEvent} from "@/types/OrderEvent.ts";
 import {OrderEventType} from "@/types/OrderEventType.ts";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
 import {OrderDetailsSheet} from "@/feature/daily-order/components/OrderDetailsSheet.tsx";
+import {useSoundStore} from "@/shared/store/soundStore.ts";
 
 const webSocketService = new KitchenWebSocketService();
 
@@ -22,6 +23,7 @@ export function DailyOrderScreen() {
     const handleOrderEvent = (event: OrderEvent) => {
         switch (event.type) {
             case OrderEventType.CREATED:
+                useSoundStore.getState().reproducir('nuevo-pedido');
                 fetchOrders()
                     .then(setOrders)
                     .catch(e => setError(e.message));
@@ -31,6 +33,10 @@ export function DailyOrderScreen() {
             case OrderEventType.UPDATED:
                 break;
             case OrderEventType.CANCELLED:
+                useSoundStore.getState().reproducir('pedido-cancelado');
+                fetchOrders()
+                    .then(setOrders)
+                    .catch(e => setError(e.message));
                 break;
         }
     };

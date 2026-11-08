@@ -2,6 +2,7 @@ import {SidebarInset, SidebarProvider, SidebarTrigger} from "@/shared/shadcn/com
 import {SidebarComponent} from "@/component/sidebar/SidebarComponent.tsx";
 import {Outlet, useLocation} from "react-router-dom";
 import {MENU_ITEMS} from "@/component/sidebar/menuItems.ts";
+import {SoundToggleComponent} from "@/component/sound/SoundToggleComponent.tsx";
 
 export function SidebarLayoutComponent() {
     const {pathname} = useLocation();
@@ -33,9 +34,13 @@ export function SidebarLayoutComponent() {
                             {title}
                         </h1>
                     </div>
-                    <div className="flex flex-col items-end">
-                        <span className="text-lg font-semibold">{hour}</span>
-                        <span className="text-sm text-muted-foreground">{fullDate}</span>
+                    <div className="flex items-center gap-4">
+                        {/* solo el tablero del día recibe pedidos por WebSocket */}
+                        {pathname === "/pedidos-del-dia" && <SoundToggleComponent/>}
+                        <div className="flex flex-col items-end">
+                            <span className="text-lg font-semibold">{hour}</span>
+                            <span className="text-sm text-muted-foreground">{fullDate}</span>
+                        </div>
                     </div>
                 </header>
                 <main className="flex-1 min-h-0 overflow-hidden px-6 py-2 bg-slate-100">
