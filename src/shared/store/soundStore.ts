@@ -2,6 +2,9 @@ import {create} from 'zustand';
 
 export type Sonido = 'nuevo-pedido' | 'pedido-cancelado';
 
+const INTERVALO_SONIDO_MS = 3000;
+const ultimoSonido: Partial<Record<Sonido, number>> = {};
+
 interface SoundState {
     activo: boolean;
     // el navegador no deja reproducir audio hasta que el usuario haga clic en la página
@@ -24,6 +27,10 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
     reproducir: (sonido) => {
         if (!get().activo) return;
+        // cada tipo suena como máximo una vez cada INTERVALO_SONIDO_MS, para que no se encimen
+        const ahora = Date.now();
+        if (ahora - (ultimoSonido[sonido] ?? 0) < INTERVALO_SONIDO_MS) return;
+        ultimoSonido[sonido] = ahora;
         new Audio(`/sounds/${sonido}.mp3`).play()
             .then(() => set({bloqueado: false}))
             .catch((e) => {

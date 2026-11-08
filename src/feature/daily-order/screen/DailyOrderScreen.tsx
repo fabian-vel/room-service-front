@@ -1,6 +1,6 @@
 import {cn} from "@/shared/shadcn/lib/utils.ts";
 import {OrderCardComponente} from "@/feature/daily-order/components/OrderCardComponente.tsx";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import type {Order} from "@/feature/daily-order/types/Order.ts";
 import {getOrder} from "@/feature/daily-order/service/DailyOrderService.ts";
 import {KitchenWebSocketService} from "@/feature/daily-order/service/KitchenWebSocketService.ts";
@@ -13,6 +13,9 @@ import {type OrderToast, OrderToastComponent} from "@/feature/daily-order/compon
 import {calcularTotalProductos} from "@/shared/utils/order.ts";
 
 const webSocketService = new KitchenWebSocketService();
+
+const VENTANA_MS = 1000;
+const MAX_AVISOS = 3;
 
 export function DailyOrderScreen() {
 
@@ -28,41 +31,70 @@ export function DailyOrderScreen() {
         setToasts(prev => prev.filter(t => t.id !== id));
     }, []);
 
-    // recarga el tablero y avisa con los datos del pedido ya recargado
-    const avisar = (tipo: OrderToast["tipo"], pediId: number) => {
-        useSoundStore.getState().reproducir(tipo === "nuevo" ? 'nuevo-pedido' : 'pedido-cancelado');
+    // eventos que llegan dentro de la misma ventana se procesan juntos
+    const rafaga = useRef<Record<OrderToast["tipo"], number[]>>({nuevo: [], cancelado: []});
+    const rafagaTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+    // solo se aplica la respuesta de la última recarga, aunque una anterior llegue después
+    const ultimaRecarga = useRef(0);
+
+    const fetchOrders = async (): Promise<Order[]> => {
+        const recarga = ++ultimaRecarga.current;
+        const nuevos = await getOrder();
+        if (recarga === ultimaRecarga.current) setOrders(nuevos);
+        return nuevos;
+    };
+
+    const procesarRafaga = () => {
+        rafagaTimer.current = undefined;
+        const eventos = rafaga.current;
+        rafaga.current = {nuevo: [], cancelado: []};
+
+        if (eventos.nuevo.length) useSoundStore.getState().reproducir('nuevo-pedido');
+        if (eventos.cancelado.length) useSoundStore.getState().reproducir('pedido-cancelado');
+
         fetchOrders()
-            .then(nuevos => {
-                setOrders(nuevos);
-                const pedido = nuevos.find(o => o.pediId === pediId);
-                setToasts(prev => [...prev, {
-                    id: Date.now() + pediId,
-                    tipo,
-                    pediId,
-                    habitacion: pedido?.pediHabitacion,
-                    productos: pedido ? calcularTotalProductos(pedido.detallePedidoList) : undefined,
-                }]);
+            .then(pedidos => {
+                const aviso = (tipo: OrderToast["tipo"]): OrderToast[] => {
+                    const ids = eventos[tipo];
+                    if (!ids.length) return [];
+                    const encontrados = ids
+                        .map(id => pedidos.find(o => o.pediId === id))
+                        .filter(o => o !== undefined);
+                    return [{
+                        id: Date.now() + (tipo === "nuevo" ? 0 : 1),
+                        tipo,
+                        cantidad: ids.length,
+                        habitaciones: encontrados.map(o => o.pediHabitacion),
+                        productos: ids.length === 1 && encontrados[0]
+                            ? calcularTotalProductos(encontrados[0].detallePedidoList)
+                            : undefined,
+                        pediId: ids[0],
+                    }];
+                };
+                setToasts(prev => [...prev, ...aviso("nuevo"), ...aviso("cancelado")].slice(-MAX_AVISOS));
             })
             .catch(e => setError(e.message));
+    };
+
+    const encolar = (tipo: OrderToast["tipo"], pediId: number) => {
+        rafaga.current[tipo].push(pediId);
+        // la ventana empieza con el primer evento y no se alarga con los siguientes
+        rafagaTimer.current ??= setTimeout(procesarRafaga, VENTANA_MS);
     };
 
     const handleOrderEvent = (event: OrderEvent) => {
         switch (event.type) {
             case OrderEventType.CREATED:
-                avisar("nuevo", event.pedidoId);
+                encolar("nuevo", event.pedidoId);
                 break;
             case OrderEventType.STATUS_CHANGED:
                 break;
             case OrderEventType.UPDATED:
                 break;
             case OrderEventType.CANCELLED:
-                avisar("cancelado", event.pedidoId);
+                encolar("cancelado", event.pedidoId);
                 break;
         }
-    };
-
-    const fetchOrders = async (): Promise<Order[]> => {
-        return await getOrder();
     };
 
     useEffect(() => {
@@ -84,6 +116,7 @@ export function DailyOrderScreen() {
 
         return () => {
             controller.abort();
+            clearTimeout(rafagaTimer.current);
             webSocketService.disconnect();
         };
     }, []);
@@ -214,9 +247,7 @@ export function DailyOrderScreen() {
                 onOpenChange={setSheetOpen}
                 onEstadoCambiado={() => {
                     setSheetOpen(false);
-                    fetchOrders()
-                        .then(setOrders)
-                        .catch(e => setError(e.message));
+                    fetchOrders().catch(e => setError(e.message));
                 }}
             />
         </div>
