@@ -1,6 +1,6 @@
 import {cn} from "@/shared/shadcn/lib/utils.ts";
 import {OrderCardComponente} from "@/feature/daily-order/components/OrderCardComponente.tsx";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import type {Order} from "@/feature/daily-order/types/Order.ts";
 import {getOrder} from "@/feature/daily-order/service/DailyOrderService.ts";
 import {KitchenWebSocketService} from "@/feature/daily-order/service/KitchenWebSocketService.ts";
@@ -9,6 +9,8 @@ import {OrderEventType} from "@/types/OrderEventType.ts";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
 import {OrderDetailsSheet} from "@/feature/daily-order/components/OrderDetailsSheet.tsx";
 import {useSoundStore} from "@/shared/store/soundStore.ts";
+import {type OrderToast, OrderToastComponent} from "@/feature/daily-order/components/OrderToastComponent.tsx";
+import {calcularTotalProductos} from "@/shared/utils/order.ts";
 
 const webSocketService = new KitchenWebSocketService();
 
@@ -20,23 +22,41 @@ export function DailyOrderScreen() {
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [sheetOpen, setSheetOpen] = useState(false);
 
+    const [toasts, setToasts] = useState<OrderToast[]>([]);
+
+    const cerrarToast = useCallback((id: number) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    }, []);
+
+    // recarga el tablero y avisa con los datos del pedido ya recargado
+    const avisar = (tipo: OrderToast["tipo"], pediId: number) => {
+        useSoundStore.getState().reproducir(tipo === "nuevo" ? 'nuevo-pedido' : 'pedido-cancelado');
+        fetchOrders()
+            .then(nuevos => {
+                setOrders(nuevos);
+                const pedido = nuevos.find(o => o.pediId === pediId);
+                setToasts(prev => [...prev, {
+                    id: Date.now() + pediId,
+                    tipo,
+                    pediId,
+                    habitacion: pedido?.pediHabitacion,
+                    productos: pedido ? calcularTotalProductos(pedido.detallePedidoList) : undefined,
+                }]);
+            })
+            .catch(e => setError(e.message));
+    };
+
     const handleOrderEvent = (event: OrderEvent) => {
         switch (event.type) {
             case OrderEventType.CREATED:
-                useSoundStore.getState().reproducir('nuevo-pedido');
-                fetchOrders()
-                    .then(setOrders)
-                    .catch(e => setError(e.message));
+                avisar("nuevo", event.pedidoId);
                 break;
             case OrderEventType.STATUS_CHANGED:
                 break;
             case OrderEventType.UPDATED:
                 break;
             case OrderEventType.CANCELLED:
-                useSoundStore.getState().reproducir('pedido-cancelado');
-                fetchOrders()
-                    .then(setOrders)
-                    .catch(e => setError(e.message));
+                avisar("cancelado", event.pedidoId);
                 break;
         }
     };
@@ -186,6 +206,7 @@ export function DailyOrderScreen() {
                     </Button>
                 </div>
             </section>
+            <OrderToastComponent toasts={toasts} onClose={cerrarToast}/>
             <OrderDetailsSheet
                 key={selectedOrder?.pediId}
                 open={sheetOpen}
