@@ -25,7 +25,7 @@ export function CatalogLabels() {
             const result = await getLabels();
             setData(result);
         } catch (e: unknown) {
-            setError(e instanceof Error ? e.message : "Failed to load");
+            setError(e instanceof Error ? e.message : "No se pudo cargar");
         } finally {
             setLoading(false);
         }
@@ -83,7 +83,7 @@ export function CatalogLabels() {
     const {paginatedData, currentPage, totalPages, goToPage} = usePagination(data);
 
     if (loading)
-        return <div className="flex h-full items-center justify-center">Loading...</div>;
+        return <div className="flex h-full items-center justify-center">Cargando...</div>;
 
     if (error)
         return <div className="flex h-full items-center justify-center text-red-600">{error}</div>;

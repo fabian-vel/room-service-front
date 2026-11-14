@@ -30,12 +30,12 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
     const validate = (): boolean => {
         const e: typeof errors = {};
 
-        if (!form.mecaLlaveMst.trim()) e.mecaLlaveMst = "Required";
-        if (form.mecaLlaveMst.length > 50) e.mecaLlaveMst = "Maximum 50 characters";
-        if (!form.mecaNombre.trim()) e.mecaNombre = "Required";
-        if (form.mecaNombre.length > 100) e.mecaNombre = "Maximum 100 characters";
-        if (form.mecaDescripcion && form.mecaDescripcion.length > 255) e.mecaDescripcion = "Maximum 255 characters";
-        if (form.mecaImagenUrl && form.mecaImagenUrl.length > 500) e.mecaImagenUrl = "Maximum 500 characters";
+        if (!form.mecaLlaveMst.trim()) e.mecaLlaveMst = "Requerido";
+        if (form.mecaLlaveMst.length > 50) e.mecaLlaveMst = "Máximo 50 caracteres";
+        if (!form.mecaNombre.trim()) e.mecaNombre = "Requerido";
+        if (form.mecaNombre.length > 100) e.mecaNombre = "Máximo 100 caracteres";
+        if (form.mecaDescripcion && form.mecaDescripcion.length > 255) e.mecaDescripcion = "Máximo 255 caracteres";
+        if (form.mecaImagenUrl && form.mecaImagenUrl.length > 500) e.mecaImagenUrl = "Máximo 500 caracteres";
 
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -62,7 +62,7 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
     return (
         <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-1.5">
-                <Label htmlFor="meca_llave_mst">Key *</Label>
+                <Label htmlFor="meca_llave_mst">Llave *</Label>
                 <Input
                     id="meca_llave_mst"
                     value={form.mecaLlaveMst}
@@ -74,7 +74,7 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
             </div>
 
             <div className="grid gap-1.5">
-                <Label htmlFor="meca_nombre">Name *</Label>
+                <Label htmlFor="meca_nombre">Nombre *</Label>
                 <Input
                     id="meca_nombre"
                     value={form.mecaNombre}
@@ -85,7 +85,7 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
             </div>
 
             <div className="grid gap-1.5">
-                <Label htmlFor="meca_descripcion">Description</Label>
+                <Label htmlFor="meca_descripcion">Descripción</Label>
                 <Input
                     id="meca_descripcion"
                     value={form.mecaDescripcion ?? ""}
@@ -95,7 +95,7 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
             </div>
 
             <div className="grid gap-1.5">
-                <Label htmlFor="meca_imagen_url">Image URL</Label>
+                <Label htmlFor="meca_imagen_url">URL de imagen</Label>
                 <Input
                     id="meca_imagen_url"
                     value={form.mecaImagenUrl ?? ""}
@@ -105,7 +105,7 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
             </div>
 
             <div className="grid gap-1.5">
-                <Label htmlFor="meca_parent_id">Parent ID</Label>
+                <Label htmlFor="meca_parent_id">ID de categoría padre</Label>
                 <Input
                     id="meca_parent_id"
                     type="number"
@@ -116,10 +116,10 @@ export function CategoriesForm({initialData, onSubmit, onCancel}: Readonly<Props
 
             <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
-                    Cancel
+                    Cancelar
                 </Button>
                 <Button type="submit" disabled={submitting}>
-                    {submitting ? "Saving..." : initialData ? "Update" : "Create"}
+                    {submitting ? "Guardando..." : initialData ? "Actualizar" : "Crear"}
                 </Button>
             </div>
         </form>

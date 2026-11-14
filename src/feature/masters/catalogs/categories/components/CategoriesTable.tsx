@@ -29,7 +29,7 @@ export function CategoriesTable({data, selectedItem, onSelectionChange}: Readonl
                     {data.length === 0 ? (
                         <TableRow className="hover:bg-transparent">
                             <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
-                                No categories
+                                No hay categorías
                             </TableCell>
                         </TableRow>
                     ) : (

@@ -28,11 +28,11 @@ export function ConstantsForm({initialData, onSubmit, onCancel}: Readonly<Props>
     const validate = (): boolean => {
         const e: typeof errors = {};
 
-        if (!form.consLlave.trim()) e.consLlave = "Required";
-        if (form.consLlave.length > 100) e.consLlave = "Maximum 100 characters";
-        if (!form.consValor.trim()) e.consValor = "Required";
-        if (form.consValor.length > 100) e.consValor = "Maximum 100 characters";
-        if (form.consDescripcion && form.consDescripcion.length > 255) e.consDescripcion = "Maximum 255 characters";
+        if (!form.consLlave.trim()) e.consLlave = "Requerido";
+        if (form.consLlave.length > 100) e.consLlave = "Máximo 100 caracteres";
+        if (!form.consValor.trim()) e.consValor = "Requerido";
+        if (form.consValor.length > 100) e.consValor = "Máximo 100 caracteres";
+        if (form.consDescripcion && form.consDescripcion.length > 255) e.consDescripcion = "Máximo 255 caracteres";
 
         setErrors(e);
         return Object.keys(e).length === 0;
@@ -57,7 +57,7 @@ export function ConstantsForm({initialData, onSubmit, onCancel}: Readonly<Props>
     return (
         <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-1.5">
-                <Label htmlFor="cons_llave">Key *</Label>
+                <Label htmlFor="cons_llave">Llave *</Label>
                 <Input
                     id="cons_llave"
                     value={form.consLlave}
@@ -69,7 +69,7 @@ export function ConstantsForm({initialData, onSubmit, onCancel}: Readonly<Props>
             </div>
 
             <div className="grid gap-1.5">
-                <Label htmlFor="cons_valor">Value *</Label>
+                <Label htmlFor="cons_valor">Valor *</Label>
                 <Input
                     id="cons_valor"
                     value={form.consValor}
@@ -80,7 +80,7 @@ export function ConstantsForm({initialData, onSubmit, onCancel}: Readonly<Props>
             </div>
 
             <div className="grid gap-1.5">
-                <Label htmlFor="cons_descripcion">Description</Label>
+                <Label htmlFor="cons_descripcion">Descripción</Label>
                 <Input
                     id="cons_descripcion"
                     value={form.consDescripcion ?? ""}
@@ -91,10 +91,10 @@ export function ConstantsForm({initialData, onSubmit, onCancel}: Readonly<Props>
 
             <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={onCancel} disabled={submitting}>
-                    Cancel
+                    Cancelar
                 </Button>
                 <Button type="submit" disabled={submitting}>
-                    {submitting ? "Saving..." : initialData ? "Update" : "Create"}
+                    {submitting ? "Guardando..." : initialData ? "Actualizar" : "Crear"}
                 </Button>
             </div>
         </form>

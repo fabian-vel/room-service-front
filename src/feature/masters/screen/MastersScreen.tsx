@@ -31,7 +31,7 @@ export function MastersScreen() {
 
             <div className="min-h-0 flex-1">
                 {ActiveCatalog ? <ActiveCatalog/> : (
-                    <p className="text-center text-muted-foreground">Master not found</p>
+                    <p className="text-center text-muted-foreground">Maestro no encontrado</p>
                 )}
             </div>
         </div>

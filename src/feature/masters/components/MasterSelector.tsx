@@ -1,7 +1,7 @@
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from "@/shared/shadcn/components/ui/select.tsx";
 
 const MASTERS = [
-    {value: "categories", label: "Categorias"},
+    {value: "categories", label: "Categorías"},
     {value: "labels", label: "Etiquetas"},
     {value: "constants", label: "Constantes"},
 ] as const;

@@ -28,7 +28,7 @@ export function LabelsTable({data, selectedItem, onSelectionChange}: Readonly<Pr
                     {data.length === 0 ? (
                         <TableRow className="hover:bg-transparent">
                             <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                No labels
+                                No hay etiquetas
                             </TableCell>
                         </TableRow>
                     ) : (

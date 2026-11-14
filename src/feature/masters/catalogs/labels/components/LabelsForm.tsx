@@ -57,7 +57,7 @@ export function LabelsForm({initialData, onSubmit, onCancel}: Readonly<Props>) {
     return (
         <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-1.5">
-                <UILabel htmlFor="etic_llave_mst">Key *</UILabel>
+                <UILabel htmlFor="etic_llave_mst">Llave *</UILabel>
                 <Input
                     id="etic_llave_mst"
                     value={form.etiqLlaveMst}
@@ -69,7 +69,7 @@ export function LabelsForm({initialData, onSubmit, onCancel}: Readonly<Props>) {
             </div>
 
             <div className="grid gap-1.5">
-                <UILabel htmlFor="etiq_nombre">Name *</UILabel>
+                <UILabel htmlFor="etiq_nombre">Nombre *</UILabel>
                 <Input
                     id="etiq_nombre"
                     value={form.etiqNombre}
@@ -80,7 +80,7 @@ export function LabelsForm({initialData, onSubmit, onCancel}: Readonly<Props>) {
             </div>
 
             <div className="grid gap-1.5">
-                <UILabel htmlFor="etiq_descripcion">Description</UILabel>
+                <UILabel htmlFor="etiq_descripcion">Descripción</UILabel>
                 <Input
                     id="etiq_descripcion"
                     value={form.etiqDescripcion ?? ""}
@@ -94,7 +94,7 @@ export function LabelsForm({initialData, onSubmit, onCancel}: Readonly<Props>) {
                     Cancelar
                 </Button>
                 <Button type="submit" disabled={submitting}>
-                    {submitting ? "Saving..." : initialData ? "Actualizar" : "Crear"}
+                    {submitting ? "Guardando..." : initialData ? "Actualizar" : "Crear"}
                 </Button>
             </div>
         </form>

@@ -28,7 +28,7 @@ export function ConstantsTable({data, selectedItem, onSelectionChange}: Readonly
                     {data.length === 0 ? (
                         <TableRow className="hover:bg-transparent">
                             <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                                No constants
+                                No hay constantes
                             </TableCell>
                         </TableRow>
                     ) : (
