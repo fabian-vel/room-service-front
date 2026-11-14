@@ -76,10 +76,14 @@ export function DailyOrderScreen() {
             .catch(e => setError(e.message));
     };
 
+    // la ventana empieza con el primer evento y no se alarga con los siguientes
+    const programarRafaga = () => {
+        rafagaTimer.current ??= setTimeout(procesarRafaga, VENTANA_MS);
+    };
+
     const encolar = (tipo: OrderToast["tipo"], pediId: number) => {
         rafaga.current[tipo].push(pediId);
-        // la ventana empieza con el primer evento y no se alarga con los siguientes
-        rafagaTimer.current ??= setTimeout(procesarRafaga, VENTANA_MS);
+        programarRafaga();
     };
 
     const handleOrderEvent = (event: OrderEvent) => {
@@ -87,9 +91,10 @@ export function DailyOrderScreen() {
             case OrderEventType.CREATED:
                 encolar("nuevo", event.pedidoId);
                 break;
+            // otra pantalla de cocina cambió o editó un pedido: solo se recarga, sin sonido ni aviso
             case OrderEventType.STATUS_CHANGED:
-                break;
             case OrderEventType.UPDATED:
+                programarRafaga();
                 break;
             case OrderEventType.CANCELLED:
                 encolar("cancelado", event.pedidoId);
