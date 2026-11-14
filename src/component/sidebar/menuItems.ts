@@ -1,4 +1,4 @@
-import {CalendarDays, ChartColumnBig, ClipboardClock, ClipboardList, Database, Utensils} from "lucide-react";
+import {CalendarDays, ChartColumnBig, ClipboardList, Database, Utensils} from "lucide-react";
 import type {LucideIcon} from "lucide-react";
 
 export interface SidebarMenuItem {
@@ -17,11 +17,6 @@ export const MENU_ITEMS: SidebarMenuItem[] = [
         title: "Pedidos del día",
         icon: CalendarDays,
         href: "/pedidos-del-dia",
-    },
-    {
-        title: "Historial",
-        icon: ClipboardClock,
-        href: "/history",
     },
     {
         title: "Menú",

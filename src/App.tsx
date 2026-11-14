@@ -2,7 +2,6 @@ import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import {LoginScreen} from "./feature/auth/screen/LoginScreen";
 import {OrderScreen} from "./feature/order/screen/OrderScreen";
 import {DailyOrderScreen} from "./feature/daily-order/screen/DailyOrderScreen";
-import {HistoryScreen} from "./feature/history/screen/HistoryScreen";
 import {MenuScreen} from "./feature/menu/screen/MenuScreen";
 import {ReportesScreen} from "./feature/reportes/screen/ReportesScreen";
 import {MastersScreen} from "./feature/masters/screen/MastersScreen";
@@ -26,7 +25,6 @@ function App() {
                 }>
                     <Route path="/order" element={<OrderScreen/>}/>
                     <Route path="/pedidos-del-dia" element={<DailyOrderScreen/>}/>
-                    <Route path="/history" element={<HistoryScreen/>}/>
                     <Route path="/menu" element={<MenuScreen/>}/>
                     <Route path="/reportes" element={<ReportesScreen/>}/>
                     <Route path="/masters" element={<MastersScreen/>}/>
