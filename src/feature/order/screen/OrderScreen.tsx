@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {useSearchParams} from "react-router-dom";
 import {Input} from "@/shared/shadcn/components/ui/input.tsx";
 import {Label} from "@/shared/shadcn/components/ui/label.tsx";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
@@ -49,8 +50,19 @@ export function OrderScreen() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // filtros aplicados a la consulta; al entrar a la vista se consulta sin filtros
-    const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+    // filtros aplicados a la consulta; al entrar se consulta sin filtros, salvo el estado
+    // que llega en la URL desde "Ver todo" del tablero (/order?estado=1)
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [filters, setFilters] = useState<Filters>(() => {
+        const estado = searchParams.get("estado");
+        const valido = ESTADOS.some(e => e.value === estado);
+        return valido ? {...EMPTY_FILTERS, estado: estado!} : EMPTY_FILTERS;
+    });
+
+    // ya aplicado, se quita de la URL para que no quede desfasado al cambiar el filtro a mano
+    useEffect(() => {
+        if (searchParams.has("estado")) setSearchParams({}, {replace: true});
+    }, [searchParams, setSearchParams]);
     const [page, setPage] = useState(1);
     const [habitacionInput, setHabitacionInput] = useState("");
     const [productoInput, setProductoInput] = useState("");

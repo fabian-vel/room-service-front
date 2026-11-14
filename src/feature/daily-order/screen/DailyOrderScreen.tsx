@@ -1,6 +1,7 @@
 import {cn} from "@/shared/shadcn/lib/utils.ts";
 import {OrderCardComponente} from "@/feature/daily-order/components/OrderCardComponente.tsx";
 import {useCallback, useEffect, useRef, useState} from "react";
+import {useNavigate} from "react-router-dom";
 import type {Order} from "@/feature/daily-order/types/Order.ts";
 import {getOrder} from "@/feature/daily-order/service/DailyOrderService.ts";
 import {KitchenWebSocketService} from "@/feature/daily-order/service/KitchenWebSocketService.ts";
@@ -26,6 +27,7 @@ export function DailyOrderScreen() {
     const [sheetOpen, setSheetOpen] = useState(false);
 
     const [toasts, setToasts] = useState<OrderToast[]>([]);
+    const navigate = useNavigate();
 
     const cerrarToast = useCallback((id: number) => {
         setToasts(prev => prev.filter(t => t.id !== id));
@@ -126,6 +128,9 @@ export function DailyOrderScreen() {
         };
     }, []);
 
+    // la vista de pedidos lee el estado de la URL y lo aplica como filtro
+    const verTodo = (espeId: number) => navigate(`/order?estado=${espeId}`);
+
     const openOrder = (order: Order) => {
         setSelectedOrder(order);
         setSheetOpen(true);
@@ -173,8 +178,7 @@ export function DailyOrderScreen() {
                         className="w-full mt-6 bg-transparent border border-yellow-600 text-back
                         hover:bg-transparent hover:text-white hover:bg-yellow-600"
                         disabled={pendientes.length <= 0}
-                        onClick={() => {
-                        }}
+                        onClick={() => verTodo(1)}
                     >
                         Ver todo ({pendientes.length})
                     </Button>
@@ -205,10 +209,9 @@ export function DailyOrderScreen() {
                         className="w-full mt-6 bg-transparent border border-green-700 text-back
                         hover:bg-transparent hover:text-white hover:bg-green-700"
                         disabled={preparacion.length <= 0}
-                        onClick={() => {
-                        }}
+                        onClick={() => verTodo(2)}
                     >
-                        Ver todo ({pendientes.length})
+                        Ver todo ({preparacion.length})
                     </Button>
                 </div>
             </section>
@@ -237,10 +240,9 @@ export function DailyOrderScreen() {
                         className="w-full mt-6 bg-transparent border border-blue-900 text-back
                         hover:bg-transparent hover:text-white hover:bg-blue-900"
                         disabled={entregados.length <= 0}
-                        onClick={() => {
-                        }}
+                        onClick={() => verTodo(3)}
                     >
-                        Ver todo ({pendientes.length})
+                        Ver todo ({entregados.length})
                     </Button>
                 </div>
             </section>
