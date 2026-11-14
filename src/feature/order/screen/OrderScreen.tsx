@@ -10,6 +10,7 @@ import type {Order} from "@/feature/order/types/Order.ts";
 import {getOrders} from "@/feature/order/service/OrderService.ts";
 import {OrdersTable} from "@/feature/order/components/OrdersTable.tsx";
 import {CatalogPaginator} from "@/feature/masters/catalogs/components/CatalogPaginator.tsx";
+import {OrderDetailsSheet} from "@/feature/daily-order/components/OrderDetailsSheet.tsx";
 
 const PAGE_SIZE = 20;
 const MIN_PRODUCTO_LENGTH = 3;
@@ -54,6 +55,11 @@ export function OrderScreen() {
     const [habitacionInput, setHabitacionInput] = useState("");
     const [productoInput, setProductoInput] = useState("");
 
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [sheetOpen, setSheetOpen] = useState(false);
+    // al cambiar el estado desde el detalle se vuelve a consultar la página actual
+    const [recarga, setRecarga] = useState(0);
+
     const applyFilters = (changes: Partial<Filters>) => {
         setFilters(prev => ({...prev, ...changes}));
         setPage(1);
@@ -85,7 +91,7 @@ export function OrderScreen() {
                 if (!controller.signal.aborted) setLoading(false);
             });
         return () => controller.abort();
-    }, [filters, page]);
+    }, [filters, page, recarga]);
 
     // los filtros de texto se aplican cuando el usuario deja de escribir
     useEffect(() => {
@@ -193,10 +199,22 @@ export function OrderScreen() {
                     orders={orders}
                     showEstado
                     onOpenWindow={(order) => {
-                        console.log("Abrir ventana del pedido", order.pediId);
+                        setSelectedOrder(order);
+                        setSheetOpen(true);
                     }}
                 />
             </div>
+
+            <OrderDetailsSheet
+                key={selectedOrder?.pediId}
+                open={sheetOpen}
+                order={selectedOrder}
+                onOpenChange={setSheetOpen}
+                onEstadoCambiado={() => {
+                    setSheetOpen(false);
+                    setRecarga(n => n + 1);
+                }}
+            />
 
             <CatalogPaginator
                 currentPage={Math.min(page, totalPages)}

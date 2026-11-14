@@ -11,7 +11,7 @@ import {Bed, ClipboardList, Clock, HandPlatter} from "lucide-react";
 import {Button} from "@/shared/shadcn/components/ui/button.tsx";
 import {SubcategoryList} from "@/feature/daily-order/components/SubcategoryList.tsx";
 import {Separator} from "@/shared/shadcn/components/ui/separator.tsx";
-import {formatHour} from "@/shared/utils/date.ts";
+import {formatDate, formatHour} from "@/shared/utils/date.ts";
 import {calcularTotalProductos} from "@/shared/utils/order.ts";
 import {useState} from "react";
 import {cambiarEstadoPedido} from "@/feature/daily-order/service/DailyOrderService.ts";
@@ -104,7 +104,8 @@ export function OrderDetailsSheet({open, order, onOpenChange, onEstadoCambiado}:
                         </div>
                         <div className="flex flex-row items-center justify-start">
                             <Clock className="mr-2"/>
-                            <h1 className="text-sm font-medium">{hora}</h1>
+                            {/* con fecha: desde la lista de pedidos se abren pedidos de otros días */}
+                            <h1 className="text-sm font-medium">{formatDate(order?.pediFechaCreacion)} · {hora}</h1>
                         </div>
                     </SheetDescription>
                 </SheetHeader>
