@@ -3,6 +3,7 @@ import {SidebarComponent} from "@/component/sidebar/SidebarComponent.tsx";
 import {Outlet, useLocation} from "react-router-dom";
 import {MENU_ITEMS} from "@/component/sidebar/menuItems.ts";
 import {SoundToggleComponent} from "@/component/sound/SoundToggleComponent.tsx";
+import {CardLimitSelectComponent} from "@/component/board/CardLimitSelectComponent.tsx";
 
 export function SidebarLayoutComponent() {
     const {pathname} = useLocation();
@@ -36,7 +37,10 @@ export function SidebarLayoutComponent() {
                     </div>
                     <div className="flex items-center gap-4">
                         {/* solo el tablero del día recibe pedidos por WebSocket */}
-                        {pathname === "/pedidos-del-dia" && <SoundToggleComponent/>}
+                        {pathname === "/pedidos-del-dia" && <>
+                            <CardLimitSelectComponent/>
+                            <SoundToggleComponent/>
+                        </>}
                         <div className="flex flex-col items-end">
                             <span className="text-lg font-semibold">{hour}</span>
                             <span className="text-sm text-muted-foreground">{fullDate}</span>

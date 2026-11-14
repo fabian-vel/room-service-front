@@ -12,6 +12,7 @@ import {OrderDetailsSheet} from "@/feature/daily-order/components/OrderDetailsSh
 import {useSoundStore} from "@/shared/store/soundStore.ts";
 import {type OrderToast, OrderToastComponent} from "@/feature/daily-order/components/OrderToastComponent.tsx";
 import {calcularTotalProductos} from "@/shared/utils/order.ts";
+import {useBoardStore} from "@/shared/store/boardStore.ts";
 
 const webSocketService = new KitchenWebSocketService();
 
@@ -28,6 +29,7 @@ export function DailyOrderScreen() {
 
     const [toasts, setToasts] = useState<OrderToast[]>([]);
     const navigate = useNavigate();
+    const limiteTarjetas = useBoardStore(s => s.limiteTarjetas);
 
     const cerrarToast = useCallback((id: number) => {
         setToasts(prev => prev.filter(t => t.id !== id));
@@ -142,14 +144,21 @@ export function DailyOrderScreen() {
     if (error)
         return <div className="flex h-full items-center justify-center text-red-600">{error}</div>;
 
-    const pendientes = orders.filter(o => o.espeId === 1);
-    const preparacion = orders.filter(o => o.espeId === 2);
-    const entregados = orders.filter(o => o.espeId === 3);
+    // pediId crece con cada pedido: pendientes y preparación van del más antiguo (más urgente)
+    // al más nuevo; entregados, del más reciente al más antiguo
+    const porEstado = (espeId: number) => orders.filter(o => o.espeId === espeId);
+    const pendientes = porEstado(1).sort((a, b) => a.pediId - b.pediId);
+    const preparacion = porEstado(2).sort((a, b) => a.pediId - b.pediId);
+    const entregados = porEstado(3).sort((a, b) => b.pediId - a.pediId);
+
+    // los contadores muestran el total; solo se recortan las tarjetas visibles
+    const visibles = (lista: Order[]) =>
+        limiteTarjetas === 'todos' ? lista : lista.slice(0, Number(limiteTarjetas));
 
     const columnClass = "flex flex-1 flex-col rounded-xl border bg-white p-4 overflow-y-auto";
 
     const badgeClass =
-        "ml-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full border px-2 text-xs font-semibold";
+        "ml-3 inline-flex h-10 min-w-10 items-center justify-center rounded-full px-3 text-2xl font-bold text-white";
 
     return (
         <div className="flex h-full gap-4 overflow-hidden">
@@ -158,12 +167,12 @@ export function DailyOrderScreen() {
                     <h2 className="text-lg font-semibold text-yellow-600">
                         PENDIENTES
                     </h2>
-                    <span className={cn(badgeClass, "border-yellow-600")}>
+                    <span className={cn(badgeClass, "bg-yellow-600")}>
                             {pendientes.length}
                         </span>
                 </div>
                 <div className="space-y-3">
-                    {pendientes.map(order => (
+                    {visibles(pendientes).map(order => (
                         <OrderCardComponente
                             key={order.pediId}
                             state="pendiente"
@@ -189,12 +198,12 @@ export function DailyOrderScreen() {
                     <h2 className="text-lg font-semibold text-green-700">
                         EN PREPARACIÓN
                     </h2>
-                    <span className={cn(badgeClass, "border-green-700")}>
+                    <span className={cn(badgeClass, "bg-green-700")}>
                             {preparacion.length}
                         </span>
                 </div>
                 <div className="space-y-3">
-                    {preparacion.map(order => (
+                    {visibles(preparacion).map(order => (
                         <OrderCardComponente
                             key={order.pediId}
                             state="preparacion"
@@ -220,12 +229,12 @@ export function DailyOrderScreen() {
                     <h2 className="text-lg font-semibold text-blue-900">
                         ENTREGADOS
                     </h2>
-                    <span className={cn(badgeClass, "border-blue-900")}>
+                    <span className={cn(badgeClass, "bg-blue-900")}>
                             {entregados.length}
                         </span>
                 </div>
                 <div className="space-y-3">
-                    {entregados.map(order => (
+                    {visibles(entregados).map(order => (
                         <OrderCardComponente
                             key={order.pediId}
                             state="entregado"
