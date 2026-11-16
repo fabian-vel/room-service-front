@@ -5,6 +5,7 @@ import {DailyOrderScreen} from "./feature/daily-order/screen/DailyOrderScreen";
 import {MenuScreen} from "./feature/menu/screen/MenuScreen";
 import {ReportesScreen} from "./feature/reportes/screen/ReportesScreen";
 import {MastersScreen} from "./feature/masters/screen/MastersScreen";
+import {EmpleadosScreen} from "./feature/empleados/screen/EmpleadosScreen";
 import {useAuthStore} from "@/shared/store/authStore.ts";
 import {SidebarLayoutComponent} from "@/component/sidebar/SidebarLayoutComponent.tsx";
 
@@ -28,6 +29,7 @@ function App() {
                     <Route path="/menu" element={<MenuScreen/>}/>
                     <Route path="/reportes" element={<ReportesScreen/>}/>
                     <Route path="/masters" element={<MastersScreen/>}/>
+                    <Route path="/empleados" element={<EmpleadosScreen/>}/>
                     {/* agrega aquí las futuras vistas */}
                 </Route>
                 <Route path="*" element={<Navigate to="/login" replace/>}/>
