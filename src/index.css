@@ -135,3 +135,10 @@
 body {
   font-family: "Inter", sans-serif;
 }
+
+/* al imprimir solo sale la factura (portal fuera de #root) */
+@media print {
+    #root {
+        display: none !important;
+    }
+}
