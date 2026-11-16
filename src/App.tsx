@@ -7,6 +7,7 @@ import {ReportesScreen} from "./feature/reportes/screen/ReportesScreen";
 import {MastersScreen} from "./feature/masters/screen/MastersScreen";
 import {EmpleadosScreen} from "./feature/empleados/screen/EmpleadosScreen";
 import {FacturaScreen} from "./feature/factura/screen/FacturaScreen";
+import {HuespedesScreen} from "./feature/huespedes/screen/HuespedesScreen";
 import {useAuthStore} from "@/shared/store/authStore.ts";
 import {SidebarLayoutComponent} from "@/component/sidebar/SidebarLayoutComponent.tsx";
 
@@ -32,6 +33,7 @@ function App() {
                     <Route path="/masters" element={<MastersScreen/>}/>
                     <Route path="/empleados" element={<EmpleadosScreen/>}/>
                     <Route path="/factura" element={<FacturaScreen/>}/>
+                    <Route path="/huespedes" element={<HuespedesScreen/>}/>
                     {/* agrega aquí las futuras vistas */}
                 </Route>
                 <Route path="*" element={<Navigate to="/login" replace/>}/>
